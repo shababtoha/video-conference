@@ -16,18 +16,23 @@ let iceServers;
 // iceServers.push({
 //     urls: [ "stun:ss-turn1.xirsys.com" ]
 // });
-
-iceServers = {
-    username: "7DYczzEyXySq7SPAcEEAPzMRhrg_UFZ5SpDYDgblZ9zfgIaWlOn03h7LZqU4f0TUAAAAAFz1Dh1zaGFiYWJ0b2hh",
-    credential: "85f1ac72-85f8-11e9-88a9-7a7a3a22eac8",
-    urls: [
-        "turn:ss-turn1.xirsys.com:80?transport=udp",
-        "turn:ss-turn1.xirsys.com:3478?transport=udp",
-        "turn:ss-turn1.xirsys.com:80?transport=tcp",
-        "turn:ss-turn1.xirsys.com:3478?transport=tcp",
-        "turns:ss-turn1.xirsys.com:443?transport=tcp",
-        "turns:ss-turn1.xirsys.com:5349?transport=tcp"
-    ]
+const servers = {
+    iceServers : [
+    {
+        urls: [ "stun:ss-turn1.xirsys.com" ]
+    },
+    {
+        username: "7DYczzEyXySq7SPAcEEAPzMRhrg_UFZ5SpDYDgblZ9zfgIaWlOn03h7LZqU4f0TUAAAAAFz1Dh1zaGFiYWJ0b2hh",
+        credential: "85f1ac72-85f8-11e9-88a9-7a7a3a22eac8",
+        urls: [
+            "turn:ss-turn1.xirsys.com:80?transport=udp",
+            "turn:ss-turn1.xirsys.com:3478?transport=udp",
+            "turn:ss-turn1.xirsys.com:80?transport=tcp",
+            "turn:ss-turn1.xirsys.com:3478?transport=tcp",
+            "turns:ss-turn1.xirsys.com:443?transport=tcp",
+            "turns:ss-turn1.xirsys.com:5349?transport=tcp"
+        ]
+    }]
 };
 
 const localVideo = document.getElementById('localVideo');
@@ -80,7 +85,7 @@ socket.on("recievedCall", function (userName) {
     var answer = window.confirm(userName + " is calling you");
     console.log(answer);
     if(answer)getLocalMedia();
-    answerCall(answer);;
+    answerCall(answer);
 });
 
 socket.on("answer", function (hasAnswered) {
@@ -167,7 +172,7 @@ function handleRemoteStreamRemoved(event) {
 
 function createPeerConnection() {
     try {
-        peerConnection = new RTCPeerConnection(iceServers);
+        peerConnection = new RTCPeerConnection(servers);
         peerConnection.onicecandidate = handleIceCandidate;
         peerConnection.onaddstream = handleRemoteStreamAdded;
         peerConnection.onremovestream = handleRemoteStreamRemoved;
@@ -175,7 +180,6 @@ function createPeerConnection() {
     } catch (e) {
         console.log('Failed to create PeerConnection, exception: ' + e.message);
         alert('Cannot create RTCPeerConnection object.');
-        return;
     }
 }
 
