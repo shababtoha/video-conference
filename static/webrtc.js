@@ -84,7 +84,7 @@ socket.on("recievedCall", function (userName) {
     //todo-> answer or reject?
     var answer = window.confirm(userName + " is calling you");
     console.log(answer);
-    if(answer)getLocalMedia();
+    if(answer) getLocalMedia();
     answerCall(answer);
 });
 
@@ -204,7 +204,11 @@ function maybeStart() {
     if(typeof localStream !==undefined) {
         createPeerConnection();
         peerConnection.addStream(localStream);
-        if(initiator)  doCall();
+        if(initiator) {
+            setTimeout(function () {
+                doCall();
+            },5000);
+        }
     }
 }
 
