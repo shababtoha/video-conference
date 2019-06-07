@@ -1,9 +1,7 @@
 var socket = io();
 var peerConnection;
-let isChannelReady;
 let myName;
-
-//webrtc
+var answer;
 
 let initiator;
 
@@ -12,7 +10,7 @@ const mediaStreamConstraints = {
     audio : true,
 };
 
-let iceServers;
+
 // iceServers.push({
 //     urls: [ "stun:ss-turn1.xirsys.com" ]
 // });
@@ -45,6 +43,9 @@ function gotLocalMediaStream(mediaStream) {
     localStream = mediaStream;
     localVideo.srcObject = mediaStream;
     if(initiator) maybeStart();
+    else {
+        socket.emit('recieved',answer);
+    }
 }
 
 function handleLocalMediaStreamError(error) {
@@ -82,10 +83,9 @@ socket.on("userDisconnected", function (userName) {
 
 socket.on("recievedCall", function (userName) {
     //todo-> answer or reject?
-    var answer = window.confirm(userName + " is calling you");
+    answer = window.confirm(userName + " is calling you");
     console.log(answer);
     if(answer) getLocalMedia();
-    answerCall(answer);
 });
 
 socket.on("answer", function (hasAnswered) {
@@ -205,9 +205,7 @@ function maybeStart() {
         createPeerConnection();
         peerConnection.addStream(localStream);
         if(initiator) {
-            setTimeout(function () {
-                doCall();
-            },5000);
+            doCall();
         }
     }
 }
