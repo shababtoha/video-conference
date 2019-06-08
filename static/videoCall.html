@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+</head>
+<body>
+<label> create user</label> <input type="txt" id="roomName">
+<button id="create"> create </button>
+
+<p>  Online Users </p>
+
+<ul id="userList">
+
+</ul>
+<h1>  </h1>
+
+<video autoplay playsinline id="localVideo" muted="muted"></video>
+<video autoplay playsinline id="remoteVideo"></video>
+
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="webrtc.js"></script>
+</html>

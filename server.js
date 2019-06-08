@@ -17,7 +17,6 @@ var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
 
-    //when new connection arrives send all online users
     io.to(socket.id).emit('newconnection', users);
 
     ///handle disconnect
@@ -47,8 +46,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('message', function (message) {
-        //console.log(message);
-       // console.log()
         io.to(channel[socket.id]).emit('message', message);
     });
 
@@ -86,4 +83,12 @@ app.use(express.static('static'));
 
 app.get('/' , (req,res) => {
     res.sendFile(process.cwd()+'/static/index.html');
-}) ;
+});
+
+app.get('/videocall', (req,res)=>{
+    res.sendFile(process.cwd()+'/static/videoCall.html');
+});
+
+app.get("/conference", (req,res) => {
+    res.sendFile(process.cwd()+'/static/videoConference.html');
+});
