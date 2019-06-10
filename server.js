@@ -6,6 +6,22 @@ var idToName = {};
 
 var channel = {};
 
+
+
+let conferenceRooms = {};
+let idToRoomName = {};
+
+
+function getRoomDetails() {
+    var roomDetails = {};
+    for (var key in conferenceRooms) {
+        roomDetails[key] = conferenceRooms[key].length;
+    }
+    console.log(roomDetails);
+    return roomDetails;
+}
+
+
 const  port = process.env.PORT || 8080;
 
 var server = app.listen(port,  function() {
@@ -15,11 +31,10 @@ var server = app.listen(port,  function() {
 
 var io = require('socket.io')(server);
 
-io.on('connection', function (socket) {
+io.of('/call').on('connection', function (socket) {
+    //console.log("new connection to call");
+    socket.emit('newconnection', users);
 
-    io.to(socket.id).emit('newconnection', users);
-
-    ///handle disconnect
     socket.on('disconnect', function() {
         var userName = idToName[socket.id];
         delete idToName[socket.id];
@@ -42,7 +57,7 @@ io.on('connection', function (socket) {
         };
         idToName[socket.id] = newUser;
         console.log("new user created. username", users[newUser]);
-        io.emit('newUser', newUser);
+        io.of('call').emit('newUser', newUser);
     });
 
     socket.on('message', function (message) {
@@ -75,8 +90,69 @@ io.on('connection', function (socket) {
             users[initiatorUserName].busy = false;
         }
         io.to(channel[socket.id]).emit("answer", isRecieved);
-
     });
+
+});
+
+///conference
+
+io.of('/conference').on('connection', function (socket) {
+    const socketId = socket.id;
+    socket.emit("allrooms", getRoomDetails());
+
+    socket.on('createRoom', function (roomName) {
+        console.log("socket Id" , socket.id);
+        console.log("Room creation Request . Roomname " + roomName + " id +" , socketId);
+        if(roomName === "" || typeof roomName === "undefined" || !roomName) {
+            socket.emit("handleError", "invalid Room name");
+            return;
+        }
+        console.log(typeof conferenceRooms[roomName]);
+        if(typeof conferenceRooms[roomName] !== "undefined") {
+            socket.emit("handleError", "Already Exist");
+            return;
+        }
+        console.log("Room Creation Successful");
+        conferenceRooms[roomName] = [];
+        conferenceRooms[roomName].push(socketId);
+        io.of('conference').emit("newRoom", roomName);
+        idToRoomName[socketId] = roomName;
+    });
+
+    socket.on('message', function (message, toSocketId) {
+        console.log("recieved Message", toSocketId);
+        io.of('/conference').to(`${toSocketId}`).emit('message',message, socketId);
+    });
+
+
+    socket.on("joinRoom" , function (roomName) {
+       console.log("request to join " + roomName);
+       console.log(conferenceRooms[roomName]);
+
+
+       if(conferenceRooms[roomName] === undefined) {
+           socket.emit("handleError", "rooms doesNotExist");
+           return;
+       }
+
+       console.log("joined room");
+
+       conferenceRooms[roomName].push(socketId);
+       idToRoomName[socketId] = roomName;
+       io.of('conference').emit("joinedRoom", roomName, socketId);
+    });
+
+    socket.on('disconnect', function () {
+        var roomName = idToRoomName[socketId];
+        if(roomName !== undefined) {
+            conferenceRooms[roomName] = conferenceRooms[roomName].filter(val => val != socketId);
+            if(conferenceRooms[roomName].length == 0) {
+                delete conferenceRooms[roomName];
+            }
+            io.of('conference').emit("leftRoom", roomName);
+        }
+    });
+
 });
 
 app.use(express.static('static'));

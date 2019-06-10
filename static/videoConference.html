@@ -3,11 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 </head>
 <br>
   <label>Create Room</label> </br>
-  <input type="text" placeholder="roomName">
-  <button>create</button>
+  <input type="text" placeholder="roomName" id="roomName">
+  <button id="create">create</button>
+  <div>
+    <p>Rooms</p>
+    <ul id="rooms">
+    </ul>
+  </div>
+  <div id="videos">
+      <video id="localVideo" muted="muted" autoplay playsinline></video>
+  </div>
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="videoConference.js"></script>
 </html>

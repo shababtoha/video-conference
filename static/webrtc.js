@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io('/call');
 var peerConnection;
 let myName;
 var answer;
@@ -69,7 +69,7 @@ createButton.addEventListener('click', function () {
 
 socket.on('newconnection', function (users) {
     for(var userName in users) {
-        $("#userList").append('<li id="'+userName+'" > <p style="display: inline-block">'+userName +'</p> <button style="display: inline-block" onclick=startCall("'+userName+'")> call  </button></li>');
+        $("#userList").append('<li id="'+userName+'" > <p style="display: inline-block">'+userName +'</p>  <button style="display: inline-block" onclick=startCall("'+userName+'")> call  </button></li>');
     }
 });
 
@@ -136,10 +136,10 @@ function doAnswer() {
 function onCreateSessionDescriptionError(error) {
     console.log('Failed to create session description: ' + error.toString());
 }
-
-function answerCall(answer) {
-    socket.emit('recieved',answer);
-}
+//
+// function answerCall(answer) {
+//     socket.emit('recieved',answer);
+// }
 
 function sendMessage(message) {
     console.log("sending message", message);
