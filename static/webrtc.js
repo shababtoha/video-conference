@@ -14,6 +14,7 @@ const mediaStreamConstraints = {
 // iceServers.push({
 //     urls: [ "stun:ss-turn1.xirsys.com" ]
 // });
+document.getElementById("screenShare").disabled = true;
 const servers = {
     iceServers : [
     {
@@ -111,6 +112,7 @@ socket.on('message', function (message) {
             break;
         case 'answer':
             peerConnection.setRemoteDescription(new RTCSessionDescription(message));
+            document.getElementById("screenShare").disabled = false;
             break;
         case 'candidate' :
             var candidate = new RTCIceCandidate({
@@ -217,5 +219,19 @@ function startCall(name) {
     }
     initiator = true;
     socket.emit('initiateCall', name);
+}
+
+document.getElementById("screenShare").onclick = addScreenShare;
+function addScreenShare() {
+    // $("#screenShare").enable(true);
+    var displayMediaStreamConstraints = {
+        video: true // or pass HINTS
+    };
+
+    if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices.getDisplayMedia(displayMediaStreamConstraints).then(gotLocalMediaStream).catch(handleLocalMediaStreamError);
+    } else {
+        navigator.getDisplayMedia(displayMediaStreamConstraints).then(gotLocalMediaStream).catch(handleLocalMediaStreamError);
+    }
 }
 
