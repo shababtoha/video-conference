@@ -77,6 +77,7 @@ socket.on("message", function (message, socketId) {
         case "offer":
             peers[socketId].setRemoteDescription(new RTCSessionDescription(message));
             doAnswer(peers[socketId], socketId);
+            document.getElementById("screenShare").disabled = false;
             break;
         case "answer":
             peers[socketId].setRemoteDescription(new RTCSessionDescription(message));
@@ -237,4 +238,19 @@ function join(roomName) {
     joining = roomName;
     //socket.emit("joinRoom", roomName);
     getLocalMedia();
+}
+
+document.getElementById("screenShare").disabled = true;
+document.getElementById("screenShare").onclick = addScreenShare;
+function addScreenShare() {
+    // $("#screenShare").enable(true);
+    var displayMediaStreamConstraints = {
+        video: true // or pass HINTS
+    };
+
+    if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices.getDisplayMedia(displayMediaStreamConstraints).then(gotLocalMediaStream).catch(handleLocalMediaStreamError);
+    } else {
+        navigator.getDisplayMedia(displayMediaStreamConstraints).then(gotLocalMediaStream).catch(handleLocalMediaStreamError);
+    }
 }
