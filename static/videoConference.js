@@ -32,8 +32,25 @@ const servers = {
                 "turns:ss-turn1.xirsys.com:443?transport=tcp",
                 "turns:ss-turn1.xirsys.com:5349?transport=tcp"
             ]
+        },
+        {
+            urls: [ "stun:ss-turn2.xirsys.com" ]
+        },
+        {
+            username: "YcUe1q0LAFt5FJaX5gZJzEOacC8_Vy_N9sepbwTt3JCVsQ0OjgDKkIr6RurQORfeAAAAAF0W6XdyYW5kb212ZWdldGFibGU=",
+            credential: "aad82740-9a26-11e9-92ad-322c48b34491",
+            urls: [
+                "turn:ss-turn2.xirsys.com:80?transport=udp",
+                "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+            ]
         }]
 };
+
+
 
 
 
