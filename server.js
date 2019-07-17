@@ -1,10 +1,19 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
+var formidable = require('formidable');
+
+
 
 var users = {};
 var idToName = {};
 
 var channel = {};
+
+
 
 
 
@@ -168,3 +177,23 @@ app.get('/videocall', (req,res)=>{
 app.get("/conference", (req,res) => {
     res.sendFile(process.cwd()+'/static/videoConference.html');
 });
+
+app.get("/record", (req, res)=>{
+    res.sendFile(process.cwd()+'/static/recordRTC.html')
+});
+
+app.post("/video", (req,res) =>{
+    console.log("request has come")
+    var form = new formidable.IncomingForm();
+    form.parse(req);
+    let date = new Date();
+    form.on('fileBegin', function (name, file){
+        console.log(file);
+        file.path = process.cwd() + '/uploads/' + file.name+"-"+ date ;
+    });
+
+    form.on('file', function (name, file){
+        console.log('Uploaded ' + file.name);
+    });
+    res.send("done");
+})
