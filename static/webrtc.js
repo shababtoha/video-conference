@@ -73,8 +73,10 @@ function getLocalMedia() {
 
 
 var createButton = document.getElementById('create');
+
 createButton.addEventListener('click', function () {
     myName = document.getElementById("roomName").value;
+    console.log('myusername created')
     socket.emit('create', myName);
     createButton.disabled = true;
 });
@@ -94,10 +96,8 @@ socket.on("userDisconnected", function (userName) {
 });
 
 socket.on("recievedCall", function (userName) {
-    //todo-> answer or reject?
-    answer = window.confirm(userName + " is calling you");
-    console.log(answer);
-    if(answer) getLocalMedia();
+    console.log('call recieved from', userName);
+    getLocalMedia();
 });
 
 socket.on("answer", function (hasAnswered) {
@@ -149,10 +149,10 @@ function doAnswer() {
 function onCreateSessionDescriptionError(error) {
     console.log('Failed to create session description: ' + error.toString());
 }
-//
-// function answerCall(answer) {
-//     socket.emit('recieved',answer);
-// }
+
+function answerCall(answer) {
+    socket.emit('recieved',answer);
+}
 
 function sendMessage(message) {
     console.log("sending message", message);

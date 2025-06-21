@@ -80,6 +80,8 @@ io.of('/call').on('connection', function (socket) {
         users[intiator].busy = true;
         io.to(userSocketId).emit('recievedCall', intiator);
         console.log(idToName[socket.id] + " is calling ", userName);
+        console.log('socked id of initiator', socket.id);
+        console.log('socked id of receiver', userSocketId);
         channel[socket.id] = userSocketId;
         channel[userSocketId] = socket.id;
     });
