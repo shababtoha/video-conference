@@ -12,10 +12,6 @@ const mediaStreamConstraints = {
     audio : true,
 };
 
-
-iceServers.push({
-    urls: [ "stun:ss-turn1.xirsys.com" ]
-});
 const servers = {
     iceServers : [
         {
