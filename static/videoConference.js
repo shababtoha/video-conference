@@ -206,16 +206,14 @@ function sendOffer(peerConnection , socketID) {
     }, handleCreateOfferError);
 }
 
-
-
 function createPeerConnection(sockedId) {
     const id = sockedId.split("#")[1];
-    try{
+    try {
         peers[sockedId] = new RTCPeerConnection(servers);
         let peerConnection = peers[sockedId];
+
         peerConnection.onicecandidate = function (event) {
-            console.log("iceCandidate :" , event);
-            if(event.candidate) {
+            if (event.candidate) {
                 sendMessage({
                     type: 'candidate',
                     label: event.candidate.sdpMLineIndex,
@@ -226,21 +224,55 @@ function createPeerConnection(sockedId) {
                 console.log('End of candidates.');
             }
         };
-        peerConnection.onaddstream = function (event) {
-            $("#videos").append(`<video id="${id}"  autoplay playsinline></video>`);
-            let remoteVideo =  document.getElementById(id);
-            let remoteStream = event.stream;
-            remoteVideo.srcObject = remoteStream;
+
+        peerConnection.ontrack = function (event) {
+            $("#videos").append(`<video id="${id}" autoplay playsinline></video>`);
+            let remoteVideo = document.getElementById(id);
+            remoteVideo.srcObject = event.streams[0];
         };
-        peerConnection.onremovestream = function (event) {
-            document.getElementById("#"+id).remove();
-        };
-        peerConnection.addStream(localStream);
+
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     } catch (e) {
         console.log('Failed to create PeerConnection, exception: ' + e.message);
         alert('Cannot create RTCPeerConnection object.');
     }
 }
+
+
+
+// function createPeerConnection(sockedId) {
+//     const id = sockedId.split("#")[1];
+//     try{
+//         peers[sockedId] = new RTCPeerConnection(servers);
+//         let peerConnection = peers[sockedId];
+//         peerConnection.onicecandidate = function (event) {
+//             console.log("iceCandidate :" , event);
+//             if(event.candidate) {
+//                 sendMessage({
+//                     type: 'candidate',
+//                     label: event.candidate.sdpMLineIndex,
+//                     id: event.candidate.sdpMid,
+//                     candidate: event.candidate.candidate
+//                 }, sockedId);
+//             } else {
+//                 console.log('End of candidates.');
+//             }
+//         };
+//         peerConnection.onaddstream = function (event) {
+//             $("#videos").append(`<video id="${id}"  autoplay playsinline></video>`);
+//             let remoteVideo =  document.getElementById(id);
+//             let remoteStream = event.stream;
+//             remoteVideo.srcObject = remoteStream;
+//         };
+//         peerConnection.onremovestream = function (event) {
+//             document.getElementById("#"+id).remove();
+//         };
+//         peerConnection.addStream(localStream);
+//     } catch (e) {
+//         console.log('Failed to create PeerConnection, exception: ' + e.message);
+//         alert('Cannot create RTCPeerConnection object.');
+//     }
+// }
 
 
 function handleCreateOfferError(event) {
