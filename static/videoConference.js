@@ -13,9 +13,43 @@ const mediaStreamConstraints = {
 };
 
 
-// iceServers.push({
-//     urls: [ "stun:ss-turn1.xirsys.com" ]
-// });
+iceServers.push({
+    urls: [ "stun:ss-turn1.xirsys.com" ]
+});
+const servers = {
+    iceServers : [
+        {
+            urls: [ "stun:ss-turn1.xirsys.com" ]
+        },
+        {
+            username: "7DYczzEyXySq7SPAcEEAPzMRhrg_UFZ5SpDYDgblZ9zfgIaWlOn03h7LZqU4f0TUAAAAAFz1Dh1zaGFiYWJ0b2hh",
+            credential: "85f1ac72-85f8-11e9-88a9-7a7a3a22eac8",
+            urls: [
+                "turn:ss-turn1.xirsys.com:80?transport=udp",
+                "turn:ss-turn1.xirsys.com:3478?transport=udp",
+                "turn:ss-turn1.xirsys.com:80?transport=tcp",
+                "turn:ss-turn1.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn1.xirsys.com:443?transport=tcp",
+                "turns:ss-turn1.xirsys.com:5349?transport=tcp"
+            ]
+        },
+        {
+            urls: [ "stun:ss-turn2.xirsys.com" ]
+        },
+        {
+            username: "YcUe1q0LAFt5FJaX5gZJzEOacC8_Vy_N9sepbwTt3JCVsQ0OjgDKkIr6RurQORfeAAAAAF0W6XdyYW5kb212ZWdldGFibGU=",
+            credential: "aad82740-9a26-11e9-92ad-322c48b34491",
+            urls: [
+                "turn:ss-turn2.xirsys.com:80?transport=udp",
+                "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+            ]
+        }]
+};
+
 // const servers = {
 //     iceServers : [
 //         {
@@ -34,48 +68,14 @@ const mediaStreamConstraints = {
 //             ]
 //         },
 //         {
-//             urls: [ "stun:ss-turn2.xirsys.com" ]
-//         },
-//         {
-//             username: "YcUe1q0LAFt5FJaX5gZJzEOacC8_Vy_N9sepbwTt3JCVsQ0OjgDKkIr6RurQORfeAAAAAF0W6XdyYW5kb212ZWdldGFibGU=",
-//             credential: "aad82740-9a26-11e9-92ad-322c48b34491",
+//             username: "shabab",
+//             credential: "shabab",
 //             urls: [
-//                 "turn:ss-turn2.xirsys.com:80?transport=udp",
-//                 "turn:ss-turn2.xirsys.com:3478?transport=udp",
-//                 "turn:ss-turn2.xirsys.com:80?transport=tcp",
-//                 "turn:ss-turn2.xirsys.com:3478?transport=tcp",
-//                 "turns:ss-turn2.xirsys.com:443?transport=tcp",
-//                 "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+//                 "turn:3.86.76.203:3478?transport=udp",
+//                 "turn:3.86.76.203:3478?transport=tcp",
 //             ]
 //         }]
 // };
-
-const servers = {
-    iceServers : [
-        // {
-        //     urls: [ "stun:ss-turn1.xirsys.com" ]
-        // },
-        // {
-        //     username: "7DYczzEyXySq7SPAcEEAPzMRhrg_UFZ5SpDYDgblZ9zfgIaWlOn03h7LZqU4f0TUAAAAAFz1Dh1zaGFiYWJ0b2hh",
-        //     credential: "85f1ac72-85f8-11e9-88a9-7a7a3a22eac8",
-        //     urls: [
-        //         "turn:ss-turn1.xirsys.com:80?transport=udp",
-        //         "turn:ss-turn1.xirsys.com:3478?transport=udp",
-        //         "turn:ss-turn1.xirsys.com:80?transport=tcp",
-        //         "turn:ss-turn1.xirsys.com:3478?transport=tcp",
-        //         "turns:ss-turn1.xirsys.com:443?transport=tcp",
-        //         "turns:ss-turn1.xirsys.com:5349?transport=tcp"
-        //     ]
-        // },
-        {
-            username: "shabab",
-            credential: "shabab",
-            urls: [
-                "turn:3.86.76.203:3478?transport=udp",
-                "turn:3.86.76.203:3478?transport=tcp",
-            ]
-        }]
-};
 
 
 
@@ -206,16 +206,14 @@ function sendOffer(peerConnection , socketID) {
     }, handleCreateOfferError);
 }
 
-
-
 function createPeerConnection(sockedId) {
     const id = sockedId.split("#")[1];
-    try{
+    try {
         peers[sockedId] = new RTCPeerConnection(servers);
         let peerConnection = peers[sockedId];
+
         peerConnection.onicecandidate = function (event) {
-            console.log("iceCandidate :" , event);
-            if(event.candidate) {
+            if (event.candidate) {
                 sendMessage({
                     type: 'candidate',
                     label: event.candidate.sdpMLineIndex,
@@ -226,21 +224,55 @@ function createPeerConnection(sockedId) {
                 console.log('End of candidates.');
             }
         };
-        peerConnection.onaddstream = function (event) {
-            $("#videos").append(`<video id="${id}"  autoplay playsinline></video>`);
-            let remoteVideo =  document.getElementById(id);
-            let remoteStream = event.stream;
-            remoteVideo.srcObject = remoteStream;
+
+        peerConnection.ontrack = function (event) {
+            $("#videos").append(`<video id="${id}" autoplay playsinline></video>`);
+            let remoteVideo = document.getElementById(id);
+            remoteVideo.srcObject = event.streams[0];
         };
-        peerConnection.onremovestream = function (event) {
-            document.getElementById("#"+id).remove();
-        };
-        peerConnection.addStream(localStream);
+
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     } catch (e) {
         console.log('Failed to create PeerConnection, exception: ' + e.message);
         alert('Cannot create RTCPeerConnection object.');
     }
 }
+
+
+
+// function createPeerConnection(sockedId) {
+//     const id = sockedId.split("#")[1];
+//     try{
+//         peers[sockedId] = new RTCPeerConnection(servers);
+//         let peerConnection = peers[sockedId];
+//         peerConnection.onicecandidate = function (event) {
+//             console.log("iceCandidate :" , event);
+//             if(event.candidate) {
+//                 sendMessage({
+//                     type: 'candidate',
+//                     label: event.candidate.sdpMLineIndex,
+//                     id: event.candidate.sdpMid,
+//                     candidate: event.candidate.candidate
+//                 }, sockedId);
+//             } else {
+//                 console.log('End of candidates.');
+//             }
+//         };
+//         peerConnection.onaddstream = function (event) {
+//             $("#videos").append(`<video id="${id}"  autoplay playsinline></video>`);
+//             let remoteVideo =  document.getElementById(id);
+//             let remoteStream = event.stream;
+//             remoteVideo.srcObject = remoteStream;
+//         };
+//         peerConnection.onremovestream = function (event) {
+//             document.getElementById("#"+id).remove();
+//         };
+//         peerConnection.addStream(localStream);
+//     } catch (e) {
+//         console.log('Failed to create PeerConnection, exception: ' + e.message);
+//         alert('Cannot create RTCPeerConnection object.');
+//     }
+// }
 
 
 function handleCreateOfferError(event) {
